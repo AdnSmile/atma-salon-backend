@@ -4,105 +4,101 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Reservasi;
+use App\Models\Pembayaran;
 use Illuminate\Support\Facades\Validator;
 
-class ReservasiController extends Controller
+class PembayaranController extends Controller
 {
-    // index
     public function index()
     {
-        $reservasi = Reservasi::all();
+        $pembayaran = Pembayaran::all();
 
-        if(count($reservasi) > 0){
+        if(count($pembayaran) > 0){
             
             return response()->json([
                 'success' => true,
-                'message' => 'Daftar Data Reservasi',
-                'data' => $reservasi
+                'message' => 'Daftar Data Pembayaran',
+                'data' => $pembayaran
             ], 200);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Tidak ada data reservasi',
+            'message' => 'Tidak ada data pembayaran',
             'data' => null
         ], 404);
     }
 
     public function indexById(Request $request, $id_user)
     {
-        $reservasi = Reservasi::where('id_user', $id_user)->get();
+        $pembayaran = Pembayaran::where('id_user', $id_user)->get();
 
-        if(count($reservasi) > 0){
+        if(count($pembayaran) > 0){
             
             return response()->json([
                 'success' => true,
-                'message' => 'Daftar Data Reservasi',
-                'data' => $reservasi
+                'message' => 'Daftar Data Pembayaran',
+                'data' => $pembayaran
             ], 200);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Tidak ada data reservasi',
+            'message' => 'Tidak ada data pembayaran',
             'data' => null
         ], 404);
     }
 
-    // store
     public function store(Request $request)
     {
         $storeData = $request->all();
 
         $validate = Validator::make($storeData, [
             'id_user' => 'required',
-            'model_rambut' => 'required',
+            'total_transaksi' => 'required',
+            'uang' => 'required|numeric|gte:total_transaksi',
             'tanggal' => 'required',
-            'catatan' => 'required',
         ]);
 
-        if($validate->fails()){
+        if($validate->fails())
             return response(['message' => $validate->errors()], 400);
-        }
 
-        $reservasi = Reservasi::create($storeData);
+        $pembayaran = Pembayaran::create($storeData);
+
         return response()->json([
             'success' => true,
-            'message' => 'Reservasi berhasil',
-            'data' => $reservasi
+            'message' => 'Pembayaran Berhasil',
+            'data' => $pembayaran
         ], 200);
     }
 
-    // show
     public function show($id)
     {
-        $reservasi = Reservasi::find($id);
+        $pembayaran = Pembayaran::find($id);
 
-        if(!is_null($reservasi)){
+        if(is_null($pembayaran)){
             return response()->json([
-                'success' => true,
-                'message' => 'Detail Data Reservasi',
-                'data' => $reservasi
-            ], 200);
+                'success' => false,
+                'message' => 'Data pembayaran tidak ditemukan',
+                'data' => null
+            ], 404);
         }
 
         return response()->json([
-            'success' => false,
-            'message' => 'Reservasi tidak ditemukan',
-            'data' => null
-        ], 404);
+            'success' => true,
+            'message' => 'Detail Data Pembayaran',
+            'data' => $pembayaran
+        ], 200);
     }
 
-    // update
     public function update(Request $request, $id)
     {
-        $reservasi = Reservasi::find($id);
+        $pembayaran = Pembayaran::find($id);
 
-        if(is_null($reservasi)){
+        if(is_null($pembayaran)){
             return response()->json([
                 'success' => false,
-                'message' => 'Reservasi tidak ditemukan',
+                'message' => 'pembayaran tidak ditemukan',
                 'data' => null
             ], 404);
         }
@@ -111,46 +107,45 @@ class ReservasiController extends Controller
 
         $validate = Validator::make($updateData, [
             'id_user' => 'required',
-            'model_rambut' => 'required',
+            'total_transaksi' => 'required',
+            'uang' => 'required|numeric|gte:total_transaksi',
             'tanggal' => 'required',
-            'catatan' => 'required',
         ]);
 
         if($validate->fails()){
             return response(['message' => $validate->errors()], 400);
         }
 
-        $reservasi->id_user = $updateData['id_user'];
-        $reservasi->model_rambut = $updateData['model_rambut'];
-        $reservasi->tanggal = $updateData['tanggal'];
-        $reservasi->catatan = $updateData['catatan'];
-        $reservasi->save();
+        $pembayaran->id_user = $updateData['id_user'];
+        $pembayaran->total_transaksi = $updateData['total_transaksi'];
+        $pembayaran->uang = $updateData['uang'];
+        $pembayaran->tanggal = $updateData['tanggal'];
+        $pembayaran->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'Reservasi berhasil diupdate',
-            'data' => $reservasi
+            'message' => 'Pembayaran berhasil diupdate',
+            'data' => $pembayaran
         ], 200);
     }
 
-    // destroy
     public function destroy($id)
     {
-        $reservasi = Reservasi::find($id);
+        $pembayaran = Pembayaran::find($id);
 
-        if(is_null($reservasi)){
+        if(is_null($pembayaran)){
             return response()->json([
                 'success' => false,
-                'message' => 'Reservasi tidak ditemukan',
+                'message' => 'pembayaran tidak ditemukan',
                 'data' => null
             ], 404);
         }
 
-        $reservasi->delete();
+        $pembayaran->delete();
         return response()->json([
             'success' => true,
             'message' => 'Reservasi berhasil dihapus',
-            'data' => $reservasi
+            'data' => $pembayaran
         ], 200);
     }
 }
